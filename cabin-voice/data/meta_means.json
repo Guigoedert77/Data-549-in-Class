@@ -1,0 +1,10 @@
+{
+ "vader_neg": 0.08455,
+ "vader_neu": 0.79501,
+ "vader_pos": 0.12044,
+ "vader_compound": 0.05141,
+ "n_words": 16.95946,
+ "n_exclamation": 0.36244,
+ "n_question": 0.32142,
+ "pct_upper": 0.07969
+}

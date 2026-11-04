@@ -83,13 +83,26 @@ def load_results():
     return json.load(open('data/model_results.json')), json.load(open('data/topics.json'))
 
 
+@st.cache_data
+def meta_reference():
+    return json.load(open('data/meta_means.json'))
+
+
 def explain(model, row, cls_idx, top_n=6):
-    """Contribution of each feature to the predicted class, relative to the average class (log-odds)."""
+    """Contribution of each feature to the predicted class, relative to the average class (log-odds).
+
+    Words count from zero (word absent). The extra features (tone, length, punctuation) are measured
+    against an average tweet, so a tweet of normal length does not get credit just for having words."""
     features, lr = model.named_steps['features'], model.named_steps['model']
-    x = features.transform(row)
-    x = x.toarray().ravel() if hasattr(x, 'toarray') else np.asarray(x).ravel()
-    contrib = x * (lr.coef_[cls_idx] - lr.coef_.mean(axis=0))
+    to_vec = lambda r: (lambda m: m.toarray().ravel() if hasattr(m, 'toarray') else np.asarray(m).ravel())(features.transform(r))
+    x = to_vec(row)
+    ref_row = row.copy()
+    for col, v in meta_reference().items():
+        ref_row[col] = v
     names = features.get_feature_names_out()
+    is_meta = np.char.startswith(names.astype(str), 'meta__')
+    x = np.where(is_meta, x - to_vec(ref_row), x)
+    contrib = x * (lr.coef_[cls_idx] - lr.coef_.mean(axis=0))
     nz = np.nonzero(contrib)[0]
     df = pd.DataFrame({'feature': names[nz], 'value': contrib[nz]})
     df = df[~df['feature'].str.startswith('airline__')]
@@ -118,7 +131,7 @@ def glass_plot(fig, height, legend=False):
 
 
 def plot(fig, height, legend=False):
-    st.plotly_chart(glass_plot(fig, height, legend), use_container_width=True, config={'displayModeBar': False})
+    st.plotly_chart(glass_plot(fig, height, legend), width='stretch', config={'displayModeBar': False})
 
 
 def head(title, note=''):
@@ -176,7 +189,7 @@ with st.container(key='stats'):
     st.markdown(f"""
 <div class="cv-stats">
   <div class="cv-stat"><div class="cv-ring">{ICONS['chat']}</div><div><small>Tweets learned from</small><b>14,405</b></div></div>
-  <div class="cv-stat"><div class="cv-ring">{ICONS['check']}</div><div><small>Right on new tweets</small><b>81%</b></div></div>
+  <div class="cv-stat"><div class="cv-ring">{ICONS['check']}</div><div><small>Right on new tweets</small><b>80%</b></div></div>
   <div class="cv-stat"><div class="cv-ring">{ICONS['plane']}</div><div><small>Airlines covered</small><b>6 U.S. carriers</b></div></div>
 </div>""", unsafe_allow_html=True)
 
@@ -191,7 +204,7 @@ if view == 'Score':
                          label_visibility='collapsed')
             st.selectbox('Airline', AIRLINES, key='airline')
             st.text_area('Tweet', key='tweet', height=150, max_chars=280, placeholder='Paste a tweet sent to the airline')
-            st.button('Analyze tweet', type='primary', use_container_width=True)
+            st.button('Analyze tweet', type='primary', width='stretch')
             st.markdown('<div class="cv-small">The model reads the words, punctuation and tone of the tweet. '
                         'Trained on labeled tweets sent to six U.S. airlines.</div>', unsafe_allow_html=True)
 
@@ -263,8 +276,8 @@ elif view == 'Batch':
             up = st.file_uploader('CSV file', type='csv', label_visibility='collapsed')
         with c2:
             st.download_button('Download a sample CSV', sample.to_csv(index=False), 'sample_tweets.csv', 'text/csv',
-                               use_container_width=True)
-            use_sample = st.button('Try with the sample', use_container_width=True)
+                               width='stretch')
+            use_sample = st.button('Try with the sample', width='stretch')
 
     batch = None
     if up is not None:
@@ -280,7 +293,8 @@ elif view == 'Batch':
         else:
             batch = batch.dropna(subset=[text_col]).head(2000).reset_index(drop=True)
             air_col = next((c for c in batch.columns if c.lower() == 'airline'), None)
-            airlines = batch[air_col].where(batch[air_col].isin(AIRLINES), 'United') if air_col else ['United'] * len(batch)
+            # unknown or missing airline -> 'Unknown' (the model's airline one-hot ignores it, so no airline is assumed)
+            airlines = batch[air_col].where(batch[air_col].isin(AIRLINES), 'Unknown') if air_col else ['Unknown'] * len(batch)
             with st.spinner(f'Scoring {len(batch):,} tweets…'):
                 pred, conf, proba, classes = score_many(batch[text_col].astype(str).tolist(), list(airlines))
             out = batch.copy()
@@ -297,7 +311,7 @@ elif view == 'Batch':
                         unsafe_allow_html=True)
                     st.markdown('<div style="height:.8rem"></div>', unsafe_allow_html=True)
                     st.download_button('Download scored CSV', out.to_csv(index=False), 'scored_tweets.csv', 'text/csv',
-                                       use_container_width=True, type='primary')
+                                       width='stretch', type='primary')
                     worst = out[out['sentiment'] == 'negative'].sort_values('confidence', ascending=False).head(3)
                     if len(worst):
                         st.markdown('<div class="cv-h" style="font-size:1.05rem;margin-top:1rem">Most urgent complaints</div>' +
@@ -308,7 +322,7 @@ elif view == 'Batch':
                     head('Every tweet', 'Sorted with the most confident complaints first.')
                     show = out.sort_values(['sentiment', 'confidence'], ascending=[True, False])
                     st.dataframe(show[[c for c in ['sentiment', 'confidence', air_col, text_col] if c]], height=430,
-                                 hide_index=True, use_container_width=True,
+                                 hide_index=True, width='stretch',
                                  column_config={'confidence': st.column_config.ProgressColumn('confidence', min_value=0, max_value=1, format='%.2f')})
 
 # ============================================================================= BENCHMARK
@@ -345,7 +359,7 @@ elif view == 'Benchmark':
     c3, c4 = st.columns([6, 7], gap='medium')
     with c3:
         with st.container(key='panel_b3'):
-            head('Complaints spike on bad-weather days', 'Tweets per day (bars) and share that is negative (line).')
+            head('Complaints spike on disruption days', 'Tweets per day (bars) and share that is negative (line). Feb 22-23 was a week of winter storms and mass cancellations.')
             daily = pd.crosstab(df['date'], df['airline_sentiment'])[ORDER]
             daily = daily[daily.sum(axis=1) > 50]
             pct = daily['negative'] / daily.sum(axis=1) * 100
@@ -403,7 +417,7 @@ elif view == 'Compare':
                 for tab, sent in [(tab_neg, 'negative'), (tab_pos, 'positive')]:
                     img = cloud_png(name, sent)
                     if img:
-                        tab.image(img, use_container_width=True)
+                        tab.image(img, width='stretch')
 
     with st.container(key='panel_cr'):
         head(f'{a} vs {b}: what passengers complain about', 'Share of each airline\'s negative tweets by reason.')
@@ -420,7 +434,7 @@ elif view == 'Compare':
         plot(fig, 420, legend=True)
 
     with st.container(key='panel_ch'):
-        head('When are passengers angriest?', '% of tweets that are negative, by hour of the day.')
+        head('When are passengers angriest?', '% of tweets that are negative, by hour of the day (U.S. Pacific time, as in the data).')
         fig = go.Figure()
         for name, colr in [(a, COLORS['accent']), (b, '#E9E4DC')]:
             sub = df[df['airline'] == name]
@@ -429,7 +443,7 @@ elif view == 'Compare':
             hourly = hourly[vol >= 15]
             fig.add_scatter(x=hourly.index, y=hourly.values, name=name, mode='lines+markers', line=dict(color=colr, width=3, shape='spline'),
                             hovertemplate='%{x}:00 → %{y:.0f}% negative<extra>' + name + '</extra>')
-        fig.update_xaxes(title_text='hour of the day', dtick=2)
+        fig.update_xaxes(title_text='hour of the day (Pacific time)', dtick=2)
         fig.update_yaxes(ticksuffix='%')
         plot(fig, 300, legend=True)
 
@@ -487,7 +501,7 @@ else:
     t = results['test']
     with st.container(key='panel_m0'):
         st.markdown(f"""<div class="cv-h">How good is the model?</div>
-<div class="cv-small">{results['source']}.</div>
+<div class="cv-small">{results['source']}. Scores of the notebook's final model (tuned Linear SVM).</div>
 <div class="cv-kpis" style="margin-top:1rem">
 <div class="cv-kpi"><small>Accuracy on new tweets</small><b>{t['accuracy']:.1%}</b></div>
 <div class="cv-kpi"><small>Macro F1 (main metric)</small><b>{t['macro_f1']:.3f}</b></div>
@@ -555,9 +569,10 @@ else:
         st.markdown(f"""<div class="cv-h">Good to know</div><div class="cv-why">
 <p><b>Errors happen where humans disagree too.</b> The model is right on {conf['0.9-1.0'][0]:.0%} of tweets where every labeler agreed,
 but only {conf['0.5-0.7'][0]:.0%} where they disagreed. Sarcasm and mixed tweets are hard for people and machines.</p>
-<p><b>Which model runs here.</b> The notebook's best model is the tuned Linear SVM (test macro F1 {t['macro_f1']:.3f}).
-This app uses the tuned Logistic Regression (CV macro F1 {results['tuned']['Logistic Regression (tuned)']:.3f}), almost as accurate,
-because it gives a probability for each class and its word weights are easy to explain.</p>
+<p><b>Which model runs here.</b> The scores above are the notebook's best model, the tuned Linear SVM (test macro F1 {t['macro_f1']:.3f}).
+This app runs the tuned Logistic Regression (test accuracy {results['app_model_test']['accuracy']:.1%}, test macro F1 {results['app_model_test']['macro_f1']:.3f}),
+a little less accurate, mostly on neutral tweets, but it gives a probability for each class and its word weights are easy to explain.
+After testing, it was retrained on all 14,405 labeled tweets.</p>
 <p><b>Data.</b> 14,405 tweets sent to six U.S. airlines in February 2015 (Kaggle, Twitter US Airline Sentiment). Tweets labeled
 "Delta" were actually sent to JetBlue and were corrected. One stormy week of 2015 data: new slang or events may be read less well.</p>
 <p class="cv-small">DATA-549 Natural Language Processing, Grand View University. App code and styling written with help from an AI

@@ -7,9 +7,9 @@
   "min",
   "counting",
   "two",
+  "help",
   "almost",
-  "answer",
-  "phone"
+  "try"
  ],
  "1": [
   "customer",
@@ -18,10 +18,10 @@
   "poor",
   "care",
   "line",
-  "horrible",
-  "lose",
-  "lack",
-  "agent"
+  "suck",
+  "rude",
+  "agent",
+  "horrible"
  ],
  "2": [
   "cancel",
@@ -30,34 +30,34 @@
   "today",
   "rebook",
   "rebooked",
-  "refund",
   "reschedule",
-  "home",
-  "weather"
+  "help",
+  "refund",
+  "morning"
  ],
  "3": [
   "plane",
-  "bag",
-  "wait",
   "delayed",
+  "wait",
   "gate",
-  "miss",
   "delay",
-  "late",
   "sit",
-  "make"
+  "miss",
+  "late",
+  "hour",
+  "hr"
  ],
  "4": [
   "call",
-  "back",
-  "say",
-  "number",
-  "hung",
-  "told",
-  "day",
-  "answer",
+  "help",
   "try",
-  "phone"
+  "back",
+  "phone",
+  "please",
+  "say",
+  "book",
+  "number",
+  "answer"
  ],
  "5": [
   "bad",
@@ -65,22 +65,22 @@
   "ever",
   "experience",
   "guy",
-  "travel",
-  "weather",
   "day",
+  "weather",
+  "travel",
   "last",
-  "like"
+  "well"
  ],
  "6": [
-  "help",
-  "please",
-  "try",
-  "phone",
-  "book",
-  "change",
-  "problem",
-  "online",
-  "ticket",
-  "reservation"
+  "bag",
+  "lose",
+  "luggage",
+  "check",
+  "baggage",
+  "checked",
+  "claim",
+  "land",
+  "want",
+  "like"
  ]
 }

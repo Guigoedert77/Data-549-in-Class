@@ -110,11 +110,16 @@
  },
  "topic_names": {
   "0": "Long hold times",
-  "1": "Rude / poor service",
+  "1": "Rude / poor customer service",
   "2": "Cancellations & rebooking",
-  "3": "Delays, gate & bags",
-  "4": "Calls not returned",
-  "5": "Bad overall experience",
-  "6": "Booking & online help"
+  "3": "Delays & waiting at the gate",
+  "4": "Calls & booking help",
+  "5": "Bad experience (general)",
+  "6": "Lost luggage"
+ },
+ "app_model_test": {
+  "model": "Logistic Regression (tuned)",
+  "accuracy": 0.8025,
+  "macro_f1": 0.7345
  }
 }
