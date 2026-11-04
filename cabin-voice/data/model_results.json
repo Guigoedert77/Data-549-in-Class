@@ -1,0 +1,120 @@
+{
+ "source": "DATA-549 project notebook, final run (5-fold stratified CV on 80% train, one evaluation on 20% test)",
+ "feature_sets": {
+  "TF-IDF + VADER + meta": 0.7389,
+  "TF-IDF": 0.7243,
+  "BoW": 0.7234,
+  "VADER + meta": 0.6429,
+  "LDA + NMF topics": 0.592,
+  "NMF topics": 0.5832,
+  "LDA topics": 0.483
+ },
+ "models": {
+  "Linear SVM": [
+   0.7467,
+   0.0081
+  ],
+  "XGBoost": [
+   0.7432,
+   0.0098
+  ],
+  "LightGBM": [
+   0.7406,
+   0.0104
+  ],
+  "Logistic Regression": [
+   0.7389,
+   0.006
+  ],
+  "Random Forest": [
+   0.7136,
+   0.0099
+  ],
+  "Complement NB": [
+   0.7078,
+   0.007
+  ],
+  "Multinomial NB": [
+   0.6368,
+   0.017
+  ]
+ },
+ "tuned": {
+  "Linear SVM (tuned)": 0.7489,
+  "Stacking ensemble": 0.7476,
+  "Voting ensemble": 0.7449,
+  "Logistic Regression (tuned)": 0.7433
+ },
+ "vader_cv": 0.5081,
+ "test": {
+  "model": "Linear SVM (tuned)",
+  "accuracy": 0.8094,
+  "macro_f1": 0.7533,
+  "vader_accuracy": 0.5397,
+  "vader_macro_f1": 0.5067,
+  "per_class": {
+   "negative": [
+    0.887,
+    0.883,
+    0.885,
+    1815
+   ],
+   "neutral": [
+    0.648,
+    0.617,
+    0.632,
+    609
+   ],
+   "positive": [
+    0.715,
+    0.772,
+    0.742,
+    457
+   ]
+  },
+  "confusion": [
+   [
+    1603,
+    144,
+    68
+   ],
+   [
+    160,
+    376,
+    73
+   ],
+   [
+    44,
+    60,
+    353
+   ]
+  ]
+ },
+ "labeler_confidence": {
+  "0-0.5": [
+   0.4,
+   53
+  ],
+  "0.5-0.7": [
+   0.62,
+   713
+  ],
+  "0.7-0.9": [
+   0.62,
+   68
+  ],
+  "0.9-1.0": [
+   0.89,
+   2047
+  ]
+ },
+ "topic_names": {
+  "0": "Long hold times",
+  "1": "Rude / poor service",
+  "2": "Cancellations & rebooking",
+  "3": "Delays, gate & bags",
+  "4": "Calls not returned",
+  "5": "Bad overall experience",
+  "6": "Booking & online help"
+ }
+}

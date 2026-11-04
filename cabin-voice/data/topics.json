@@ -1,0 +1,86 @@
+{
+ "0": [
+  "hour",
+  "hold",
+  "minute",
+  "wait",
+  "min",
+  "counting",
+  "two",
+  "almost",
+  "answer",
+  "phone"
+ ],
+ "1": [
+  "customer",
+  "service",
+  "terrible",
+  "poor",
+  "care",
+  "line",
+  "horrible",
+  "lose",
+  "lack",
+  "agent"
+ ],
+ "2": [
+  "cancel",
+  "flightled",
+  "tomorrow",
+  "today",
+  "rebook",
+  "rebooked",
+  "refund",
+  "reschedule",
+  "home",
+  "weather"
+ ],
+ "3": [
+  "plane",
+  "bag",
+  "wait",
+  "delayed",
+  "gate",
+  "miss",
+  "delay",
+  "late",
+  "sit",
+  "make"
+ ],
+ "4": [
+  "call",
+  "back",
+  "say",
+  "number",
+  "hung",
+  "told",
+  "day",
+  "answer",
+  "try",
+  "phone"
+ ],
+ "5": [
+  "bad",
+  "airline",
+  "ever",
+  "experience",
+  "guy",
+  "travel",
+  "weather",
+  "day",
+  "last",
+  "like"
+ ],
+ "6": [
+  "help",
+  "please",
+  "try",
+  "phone",
+  "book",
+  "change",
+  "problem",
+  "online",
+  "ticket",
+  "reservation"
+ ]
+}
