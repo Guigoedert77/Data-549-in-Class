@@ -1,34 +1,36 @@
 {
  "source": "DATA-549 project notebook, final run (5-fold stratified CV on 80% train, one evaluation on 20% test)",
  "feature_sets": {
+  "TF-IDF + VADER + meta + BERT": 0.7663,
   "TF-IDF + VADER + meta": 0.7389,
+  "BERT + VADER + meta": 0.7384,
   "TF-IDF": 0.7243,
+  "BERT + K-Means": 0.7239,
   "BoW": 0.7234,
+  "BERT": 0.7222,
   "VADER + meta": 0.6429,
+  "K-Means (k=4+5+6)": 0.6243,
   "LDA + NMF topics": 0.592,
   "NMF topics": 0.5832,
+  "K-Means (k=4)": 0.5495,
   "LDA topics": 0.483
  },
  "models": {
   "Linear SVM": [
-   0.7467,
-   0.0081
-  ],
-  "XGBoost": [
-   0.7432,
-   0.0098
+   0.773,
+   0.0111
   ],
   "LightGBM": [
-   0.7406,
-   0.0104
+   0.7708,
+   0.009
+  ],
+  "XGBoost": [
+   0.7668,
+   0.0148
   ],
   "Logistic Regression": [
-   0.7389,
-   0.006
-  ],
-  "Random Forest": [
-   0.7136,
-   0.0099
+   0.7663,
+   0.0124
   ],
   "Complement NB": [
    0.7078,
@@ -37,74 +39,79 @@
   "Multinomial NB": [
    0.6368,
    0.017
+  ],
+  "Random Forest": [
+   0.5778,
+   0.0053
   ]
  },
  "tuned": {
-  "Linear SVM (tuned)": 0.7489,
-  "Stacking ensemble": 0.7476,
-  "Voting ensemble": 0.7449,
-  "Logistic Regression (tuned)": 0.7433
+  "Linear SVM (tuned)": 0.7778,
+  "Voting ensemble": 0.7772,
+  "Logistic Regression (tuned)": 0.7766,
+  "Stacking ensemble": 0.7734,
+  "Logistic Regression on TF-IDF + VADER + meta (app)": 0.7433
  },
  "vader_cv": 0.5081,
  "test": {
-  "model": "Linear SVM (tuned)",
-  "accuracy": 0.8094,
-  "macro_f1": 0.7533,
+  "model": "Linear SVM (tuned), TF-IDF + VADER + meta + BERT",
+  "accuracy": 0.8261,
+  "macro_f1": 0.7761,
   "vader_accuracy": 0.5397,
   "vader_macro_f1": 0.5067,
   "per_class": {
    "negative": [
-    0.887,
-    0.883,
-    0.885,
+    0.903,
+    0.888,
+    0.895,
     1815
    ],
    "neutral": [
-    0.648,
-    0.617,
-    0.632,
+    0.672,
+    0.678,
+    0.675,
     609
    ],
    "positive": [
-    0.715,
-    0.772,
-    0.742,
+    0.739,
+    0.779,
+    0.758,
     457
    ]
   },
   "confusion": [
    [
-    1603,
-    144,
-    68
+    1611,
+    141,
+    63
    ],
    [
-    160,
-    376,
-    73
+    133,
+    413,
+    63
    ],
    [
-    44,
-    60,
-    353
+    40,
+    61,
+    356
    ]
   ]
  },
  "labeler_confidence": {
   "0-0.5": [
-   0.4,
+   0.36,
    53
   ],
   "0.5-0.7": [
-   0.62,
+   0.63,
    713
   ],
   "0.7-0.9": [
-   0.62,
+   0.72,
    68
   ],
   "0.9-1.0": [
-   0.89,
+   0.91,
    2047
   ]
  },

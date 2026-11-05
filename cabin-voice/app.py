@@ -501,7 +501,7 @@ else:
     t = results['test']
     with st.container(key='panel_m0'):
         st.markdown(f"""<div class="cv-h">How good is the model?</div>
-<div class="cv-small">{results['source']}. Scores of the notebook's final model (tuned Linear SVM).</div>
+<div class="cv-small">{results['source']}. Scores of the notebook's final model (tuned Linear SVM on TF-IDF + VADER + meta + BERT).</div>
 <div class="cv-kpis" style="margin-top:1rem">
 <div class="cv-kpi"><small>Accuracy on new tweets</small><b>{t['accuracy']:.1%}</b></div>
 <div class="cv-kpi"><small>Macro F1 (main metric)</small><b>{t['macro_f1']:.3f}</b></div>
@@ -519,8 +519,8 @@ else:
                                    marker_line_width=0, text=[f'{v:.3f}' for v in mods['f1']], textposition='outside', textfont=dict(color='#fff'),
                                    hovertemplate='%{y}: %{x:.4f}<extra></extra>'))
             fig.add_vline(x=results['vader_cv'], line_dash='dash', line_color='rgba(255,255,255,.6)')
-            fig.update_xaxes(range=[0.4, 0.82])
-            plot(fig, 330)
+            fig.update_xaxes(range=[0.4, 0.84])
+            plot(fig, 400)
     with m2:
         with st.container(key='panel_m2'):
             head('Which text features worked best?', 'Same model (Logistic Regression), different features.')
@@ -529,8 +529,8 @@ else:
                                    marker_color=[COLORS['accent'] if i == len(fs) - 1 else 'rgba(255,255,255,.55)' for i in range(len(fs))],
                                    text=[f'{v:.3f}' for v in fs.values], textposition='outside', textfont=dict(color='#fff'),
                                    hovertemplate='%{y}: %{x:.4f}<extra></extra>'))
-            fig.update_xaxes(range=[0.4, 0.82])
-            plot(fig, 330)
+            fig.update_xaxes(range=[0.4, 0.84])
+            plot(fig, 400)
 
     m3, m4 = st.columns([6, 7], gap='medium')
     with m3:
@@ -569,9 +569,9 @@ else:
         st.markdown(f"""<div class="cv-h">Good to know</div><div class="cv-why">
 <p><b>Errors happen where humans disagree too.</b> The model is right on {conf['0.9-1.0'][0]:.0%} of tweets where every labeler agreed,
 but only {conf['0.5-0.7'][0]:.0%} where they disagreed. Sarcasm and mixed tweets are hard for people and machines.</p>
-<p><b>Which model runs here.</b> The scores above are the notebook's best model, the tuned Linear SVM (test macro F1 {t['macro_f1']:.3f}).
-This app runs the tuned Logistic Regression (test accuracy {results['app_model_test']['accuracy']:.1%}, test macro F1 {results['app_model_test']['macro_f1']:.3f}),
-a little less accurate, mostly on neutral tweets, but it gives a probability for each class and its word weights are easy to explain.
+<p><b>Which model runs here.</b> The scores above are the notebook's best model, the tuned Linear SVM that also reads BERT sentence embeddings (test macro F1 {t['macro_f1']:.3f}).
+This app runs a lighter model without BERT, the tuned Logistic Regression on words, tone and punctuation (test accuracy {results['app_model_test']['accuracy']:.1%}, test macro F1 {results['app_model_test']['macro_f1']:.3f}).
+It is less accurate, mostly on neutral tweets, but it answers instantly, gives a probability for each class and its word weights can be explained.
 After testing, it was retrained on all 14,405 labeled tweets.</p>
 <p><b>Data.</b> 14,405 tweets sent to six U.S. airlines in February 2015 (Kaggle, Twitter US Airline Sentiment). Tweets labeled
 "Delta" were actually sent to JetBlue and were corrected. One stormy week of 2015 data: new slang or events may be read less well.</p>
