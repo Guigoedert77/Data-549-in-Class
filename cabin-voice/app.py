@@ -68,24 +68,41 @@ def use_example():
 
 
 # ----------------------------------------------------------------------------- data + model
+DATA_FILES = ['sentiment_model.joblib', 'data/tweets_clean.csv', 'data/model_results.json',
+              'data/topics.json', 'data/meta_means.json']
+
+
+def data_version():
+    """Changes whenever a data file changes, so a redeploy never serves old cached data."""
+    return tuple(os.path.getmtime(f) for f in DATA_FILES)
+
+
 @st.cache_resource
-def load_model():
+def _load_model(version):
     return joblib.load('sentiment_model.joblib')
 
 
 @st.cache_data
-def load_tweets():
+def _load_tweets(version):
     return pd.read_csv('data/tweets_clean.csv', keep_default_na=False)
 
 
 @st.cache_data
-def load_results():
+def _load_results(version):
     return json.load(open('data/model_results.json')), json.load(open('data/topics.json'))
 
 
 @st.cache_data
-def meta_reference():
+def _meta_reference(version):
     return json.load(open('data/meta_means.json'))
+
+
+load_model = lambda: _load_model(data_version())
+load_tweets = lambda: _load_tweets(data_version())
+load_results = lambda: _load_results(data_version())
+meta_reference = lambda: _meta_reference(data_version())
+distinctive_words = lambda airline, n=12: _distinctive_words(airline, data_version(), n)
+cloud_png = lambda airline, sentiment: _cloud_png(airline, sentiment, data_version())
 
 
 def explain(model, row, cls_idx, top_n=6):
@@ -145,7 +162,7 @@ def word_counts(texts):
 
 
 @st.cache_data
-def distinctive_words(airline, n=12):
+def _distinctive_words(airline, version, n=12):
     """Words used much more by this airline's passengers than by the other airlines' (log-odds ratio)."""
     df = load_tweets()
     a, b = word_counts(df.loc[df['airline'] == airline, 'text_clean_3']), word_counts(df.loc[df['airline'] != airline, 'text_clean_3'])
@@ -155,7 +172,7 @@ def distinctive_words(airline, n=12):
 
 
 @st.cache_data
-def cloud_png(airline, sentiment):
+def _cloud_png(airline, sentiment, version):
     df = load_tweets()
     sub = df[(df['airline'] == airline) & (df['airline_sentiment'] == sentiment)]
     freqs = word_counts(sub['text_clean_3'])
